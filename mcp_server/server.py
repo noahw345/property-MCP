@@ -1,42 +1,28 @@
 """FastAPI server with MCP integration."""
 
-import json
 import uvicorn
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from mcp import MCPServer
+from fastapi import FastAPI
+from mcp.server.fastmcp import FastMCP
 
-from .tools import get_comparables, get_property_info
-
-# Initialize FastAPI app
-app = FastAPI(title="Property MCP Server", version="0.1.0")
+from .tools import register_tools
 
 # Initialize MCP server
-mcp_server = MCPServer("property-mcp-server")
+mcp = FastMCP(
+    name="property-mcp-server",
+)
 
 # Register tools
-mcp_server.add_tool(get_property_info)
-mcp_server.add_tool(get_comparables)
+register_tools(mcp)
+
+# Create FastAPI app and mount MCP
+app = FastAPI(title="Property MCP Server", version="0.1.0")
+app.mount("/mcp", mcp.streamable_http_app)
 
 
 @app.get("/")
 def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "healthy", "service": "property-mcp-server"}
-
-
-@app.post("/mcp")
-async def mcp_endpoint(request: Request) -> JSONResponse:
-    """MCP endpoint for tool execution."""
-    try:
-        body = await request.json()
-        result = await mcp_server.handle_request(body)
-        return JSONResponse(content=result)
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"error": {"code": -32603, "message": str(e)}}
-        )
 
 
 def main() -> None:

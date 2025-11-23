@@ -2,8 +2,6 @@
 
 from typing import Any
 
-from mcp import Argument, tool
-
 from ..services.attom_client import ATTOMClient
 from ..utils.errors import APIError
 
@@ -11,13 +9,6 @@ from ..utils.errors import APIError
 _attom_client = ATTOMClient()
 
 
-@tool(
-    name="get_property_info",
-    description="Fetch property details from ATTOM given a full address.",
-    args=[
-        Argument(name="address", type="string", description="Full property address (e.g., '123 Main St, City, State ZIP')")
-    ],
-)
 def get_property_info(address: str) -> dict[str, Any]:
     """Fetch property information for a given address.
 
