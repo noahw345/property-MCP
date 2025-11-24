@@ -1,35 +1,22 @@
-"""FastAPI server with MCP integration."""
+"""MCP server entry point for Claude Desktop."""
 
-import uvicorn
-from fastapi import FastAPI
+import sys
 from mcp.server.fastmcp import FastMCP
-
-from .tools import register_tools
+from .tools.property_info_tool import get_property_info
 
 # Initialize MCP server
-mcp = FastMCP(
-    name="property-mcp-server",
-)
+mcp = FastMCP(name="property-mcp-server")
 
-# Register tools
-register_tools(mcp)
+# Register single tool
+mcp.tool(
+    name="get_property_info",
+    description="Fetch property details from ATTOM given a full address.",
+)(get_property_info)
 
-# Create FastAPI app and mount MCP
-app = FastAPI(title="Property MCP Server", version="0.1.0")
-app.mount("/mcp", mcp.streamable_http_app)
-
-
-@app.get("/")
-def health_check() -> dict[str, str]:
-    """Health check endpoint."""
-    return {"status": "healthy", "service": "property-mcp-server"}
-
-
-def main() -> None:
-    """Run the server."""
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
-
+# Run in stdio mode for Claude Desktop
 if __name__ == "__main__":
-    main()
-
+    try:
+        mcp.run()
+    except Exception as e:
+        print(f"Error starting server: {e}", file=sys.stderr)
+        sys.exit(1)

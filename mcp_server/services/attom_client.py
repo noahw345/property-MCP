@@ -64,38 +64,4 @@ class ATTOMClient:
         except requests.exceptions.RequestException as e:
             raise APIError(f"Request failed: {e}") from e
 
-    def get_comparables(self, address: str, count: int = 3) -> dict[str, Any]:
-        """Fetch comparable properties for a given address.
-
-        Args:
-            address: Full property address (e.g., "123 Main St, City, State ZIP").
-            count: Number of comparables to return. Defaults to 3.
-
-        Returns:
-            Dictionary containing comparable properties from ATTOM API.
-
-        Raises:
-            APIError: If the API request fails or returns an error.
-        """
-        url = f"{self.base_url}/property/comps"
-        params = {"address": address, "count": count}
-
-        try:
-            response = self.session.get(url, params=params, timeout=30)
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.HTTPError as e:
-            status_code = e.response.status_code if e.response else None
-            error_msg = f"ATTOM API error: {e}"
-            if e.response:
-                try:
-                    error_data = e.response.json()
-                    error_msg = error_data.get("error", {}).get(
-                        "message", error_msg
-                    )
-                except ValueError:
-                    error_msg = e.response.text or error_msg
-            raise APIError(error_msg, status_code=status_code) from e
-        except requests.exceptions.RequestException as e:
-            raise APIError(f"Request failed: {e}") from e
 

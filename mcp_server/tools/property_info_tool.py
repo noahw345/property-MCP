@@ -5,8 +5,16 @@ from typing import Any
 from ..services.attom_client import ATTOMClient
 from ..utils.errors import APIError
 
-# Initialize ATTOM client instance
-_attom_client = ATTOMClient()
+# Lazy initialization of ATTOM client
+_attom_client: ATTOMClient | None = None
+
+
+def _get_client() -> ATTOMClient:
+    """Get or create ATTOM client instance."""
+    global _attom_client
+    if _attom_client is None:
+        _attom_client = ATTOMClient()
+    return _attom_client
 
 
 def get_property_info(address: str) -> dict[str, Any]:
@@ -22,7 +30,8 @@ def get_property_info(address: str) -> dict[str, Any]:
         APIError: If the API request fails.
     """
     try:
-        return _attom_client.get_property_info(address)
+        client = _get_client()
+        return client.get_property_info(address)
     except APIError as e:
         error_response: dict[str, Any] = {
             "error": True,
