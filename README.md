@@ -72,3 +72,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
   }
 }
 ```
+
+## Attom API Docs
+
+https://api.developer.attomdata.com/
