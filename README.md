@@ -31,11 +31,6 @@ mcp_server/
 └── utils/
     └── errors.py        # Exceptions
 ```
-## Design Decisions
-
-1. **Clean Separation**: Tool → Service → API layers
-2. **Error Handling**: API errors returned as structured responses
-3. **Minimal Dependencies**: Only `mcp`, `requests`, `python-dotenv`
 
 ## Error Handling
 
